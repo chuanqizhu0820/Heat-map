@@ -6,12 +6,21 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
     const subTitle = document.querySelector("#sub-title");
     subTitle.textContent = `1753 - 2015: base temperature ${baseTemp}℃`;
 
+    let objArr = Object.values(data)[1];
+    let varianceArr = [];
+    for(const item of objArr){
+        varianceArr.push(Object.values(item)[2])
+    }
+    const maxTemp = Math.max(...varianceArr)+baseTemp;
+    const minTemp = Math.min(...varianceArr)+baseTemp;
+    const rangeTemp = maxTemp - minTemp;
+
     const width = 1050;
-    const height = 600;
+    const height = 480;
     const paddingLeft = 50;
     const paddingBottom = 50;
     const cellWidth = 4;
-    const cellHeight = 50;
+    const cellHeight = 40;
     const svg = d3.select('svg')
                 .attr('width', `${width+paddingLeft}`)
                 .attr('height', `${height+paddingBottom}`);
@@ -21,7 +30,7 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
                       .attr("id", "tooltip")
                       .style('opacity','0')
 
-    const colorArr = ['#FF0000', '#FF8000', '#FFFF00', '#00FFFF','#0080FF','#0000FF'];
+    const colorArr = ['#CC0000', '#CC8000', '#CCCC00','#80CC00','#00CC80','#00CCCC','#0080CC','#0000CC'];
 
     const monthList = ['January', 'February', 'March','April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -42,10 +51,27 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
         .attr('width', `${cellWidth}`)
         .attr('height', `${cellHeight}`)
         .attr('x',(d,i)=>`${Math.floor(i/12)*4+paddingLeft}`)
-        .attr('y',(d,i)=>`${(i%12)*50}`)
+        .attr('y',(d,i)=>`${(i%12)*40}`)
         .attr('fill', (d)=>
             {
-            return `rgb(${128+128*d.variance/baseTemp},128,${128-128*d.variance/baseTemp})`
+                const currTemp = d.variance + baseTemp;
+                if ((currTemp-minTemp)/rangeTemp<0.125){
+                    return colorArr[0]
+                }else if ((currTemp-minTemp)/rangeTemp<=0.25){
+                    return colorArr[1]
+                }else if ((currTemp-minTemp)/rangeTemp<=0.375){
+                    return colorArr[2]
+                }else if ((currTemp-minTemp)/rangeTemp<=0.500){
+                    return colorArr[3]
+                }else if ((currTemp-minTemp)/rangeTemp<=0.625){
+                    return colorArr[4]
+                }else if ((currTemp-minTemp)/rangeTemp<=0.750){
+                    return colorArr[5]
+                }else if ((currTemp-minTemp)/rangeTemp<=0.875){
+                    return colorArr[6]
+                }else if ((currTemp-minTemp)/rangeTemp<=1.00){
+                    return colorArr[7]
+                }
             })
        .on('mouseover', function(e,d){
            d3.select(this).style("stroke", "black");
@@ -101,16 +127,27 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
     .attr("transform", `translate(`+`${paddingLeft}`+`,`+`0)`)
     .call(yAxis);
 
+    const legendScale = d3.scaleLinear().domain([minTemp,maxTemp]).range([0,400]);
+    const legendAxis = d3.axisBottom(legendScale);
+    console.log(legendScale.domain());
+
     d3.select('#legend')
+      .attr('width', '400px')
       .append('g')
       .selectAll('rect')
       .data(colorArr)
       .enter()
       .append('rect')
       .attr('width','50px')
-      .attr('height','50px')
+      .attr('height','10px')
       .attr('x', (d,i)=>`${i*50}`)
-      .attr('fill',(d)=>`${d}`)
-      .text('hello')
+      .attr('fill',(d)=>`${d}`);
+      
+    d3.select('#legend')
+      .append('g')
+      .attr("transform", "translate(0,10)")
+      .call(legendAxis)
+    
+      
 } );
 
