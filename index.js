@@ -18,8 +18,14 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
 
     const tooltip = d3.select('body')
                       .append('div')
-                      .style('opacity', '0')
-                      .attr("class", "tooltip")
+                      .attr("id", "tooltip")
+                      .style('opacity','0')
+
+    const monthList = ['January', 'February', 'March','April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    function getMonth(num){
+        return monthList[num];
+    }
                       
     svg
       .append('g')
@@ -27,8 +33,8 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
       .data(data.monthlyVariance)
       .enter()
       .append('rect')
-        .attr('classed','cell')
-        .attr('data-month', (d)=>`${d.month}`)
+        .attr('class','cell')
+        .attr('data-month', (d)=>`${d.month-1}`)
         .attr('data-year', (d)=>`${d.year}`)
         .attr('data-temp', (d)=>`${d.variance+baseTemp}`)
         .attr('width', `${cellWidth}`)
@@ -39,33 +45,43 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
             {
             return `rgb(${128+128*d.variance/baseTemp},128,${128-128*d.variance/baseTemp})`
             })
-       .on('mouseover', function(){
+       .on('mouseover', function(e,d){
            d3.select(this).style("stroke", "black");
-           tooltip.style('opacity', '1.0')
+           tooltip.attr('data-year', `${d.year}`).style('opacity','1')
 
        })
        .on('mousemove', function(e,d){
            const xp = e.pageX;
            const yp = e.pageY;
-           tooltip.html(`The exact value of<br>this cell is:${d.month}`)
+           tooltip.html(`<p>${d.year}-${getMonth(d.month-1)}</p><p>${(d.variance+baseTemp).toFixed(2)}</p><p>${d.variance}°C</p>`)
                   .style('position', 'absolute')
-                  .style("left",`${xp+30}px`)
-                  .style("top", `${yp+30}px`)
+                  .style("left",`${xp+10}px`)
+                  .style("top", `${yp-50}px`)
+                  .style('background-color', 'white')
+                  .style('padding', '5px')
+                  .style('border-radius', '5px')
        })
-       .on('mouseout', function(e){
+       .on('mouseout', function(e,d){
            d3.select(this).style("stroke", "none");
-           tooltip.style('opacity', '0')
+           tooltip.style('opacity','0');
        })
         
     const xScale = d3.scaleLinear()
                      .domain([1753,2015])
                      .range([0,width]);
 
-    const yScale = d3.scaleBand()
-                     .domain(['Jan', 'Feb', 'Mar','Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-                     .range([0,600]);
+    let tickArr = []
+    for(let i=xScale.domain()[0];i<=xScale.domain()[1];i++){
+        if (i%10===0){
+            tickArr.push(i)
+        }
+    };
 
-    const xAxis = d3.axisBottom(xScale);
+    const yScale = d3.scaleBand()
+                     .domain(monthList)
+                     .range([0,height]);
+
+    const xAxis = d3.axisBottom(xScale).tickValues(tickArr);;
     const yAxis = d3.axisLeft(yScale);
 
     svg
