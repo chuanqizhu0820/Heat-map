@@ -84,11 +84,9 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
                      .range([0,height]);
 
     const xAxis = d3.axisBottom(xScale).tickValues(tickArr).tickFormat(function (year) {
-      var date = new Date(0);
-      date.setUTCFullYear(year);
-      var format = d3.timeFormat('%Y');
-      return format(date);
+      return `${year}`;
     });
+
     const yAxis = d3.axisLeft(yScale);
 
     svg
