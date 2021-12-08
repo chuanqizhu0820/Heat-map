@@ -21,6 +21,8 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
                       .attr("id", "tooltip")
                       .style('opacity','0')
 
+    const colorArr = ['#FF0000', '#FF8000', '#FFFF00', '#00FFFF','#0080FF','#0000FF'];
+
     const monthList = ['January', 'February', 'March','April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     function getMonth(num){
@@ -81,7 +83,12 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
                      .domain(monthList)
                      .range([0,height]);
 
-    const xAxis = d3.axisBottom(xScale).tickValues(tickArr);;
+    const xAxis = d3.axisBottom(xScale).tickValues(tickArr).tickFormat(function (year) {
+      var date = new Date(0);
+      date.setUTCFullYear(year);
+      var format = d3.timeFormat('%Y');
+      return format(date);
+    });
     const yAxis = d3.axisLeft(yScale);
 
     svg
@@ -95,4 +102,17 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
     .attr('id', 'y-axis')
     .attr("transform", `translate(`+`${paddingLeft}`+`,`+`0)`)
     .call(yAxis);
+
+    d3.select('#legend')
+      .append('g')
+      .selectAll('rect')
+      .data(colorArr)
+      .enter()
+      .append('rect')
+      .attr('width','50px')
+      .attr('height','50px')
+      .attr('x', (d,i)=>`${i*50}`)
+      .attr('fill',(d)=>`${d}`)
+      .text('hello')
 } );
+
