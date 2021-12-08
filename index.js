@@ -16,26 +16,45 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
                 .attr('width', `${width+paddingLeft}`)
                 .attr('height', `${height+paddingBottom}`);
 
+    const tooltip = d3.select('body')
+                      .append('div')
+                      .style('opacity', '0')
+                      .attr("class", "tooltip")
+                      
     svg
       .append('g')
       .selectAll('rect')
       .data(data.monthlyVariance)
       .enter()
       .append('rect')
-      .attr('classed','cell')
-      .attr('data-month', (d)=>`${d.month}`)
-      .attr('data-year', (d)=>`${d.year}`)
-      .attr('data-temp', (d)=>`${d.variance+baseTemp}`)
-      .attr('width', `${cellWidth}`)
-      .attr('height', `${cellHeight}`)
-      .attr('x',(d,i)=>`${Math.floor(i/12)*4+paddingLeft}`)
-      .attr('y',(d,i)=>`${(i%12)*50}`)
-      .attr('fill', (d)=>
-        {
-          return `rgb(${128+128*d.variance/baseTemp},128,${128-128*d.variance/baseTemp})`
-        })
-       .on('mouseover', (d)=>{
-           
+        .attr('classed','cell')
+        .attr('data-month', (d)=>`${d.month}`)
+        .attr('data-year', (d)=>`${d.year}`)
+        .attr('data-temp', (d)=>`${d.variance+baseTemp}`)
+        .attr('width', `${cellWidth}`)
+        .attr('height', `${cellHeight}`)
+        .attr('x',(d,i)=>`${Math.floor(i/12)*4+paddingLeft}`)
+        .attr('y',(d,i)=>`${(i%12)*50}`)
+        .attr('fill', (d)=>
+            {
+            return `rgb(${128+128*d.variance/baseTemp},128,${128-128*d.variance/baseTemp})`
+            })
+       .on('mouseover', function(){
+           d3.select(this).style("stroke", "black");
+           tooltip.style('opacity', '1.0')
+
+       })
+       .on('mousemove', function(e,d){
+           const xp = e.pageX;
+           const yp = e.pageY;
+           tooltip.html(`The exact value of<br>this cell is:${d.month}`)
+                  .style('position', 'absolute')
+                  .style("left",`${xp+30}px`)
+                  .style("top", `${yp+30}px`)
+       })
+       .on('mouseout', function(e){
+           d3.select(this).style("stroke", "none");
+           tooltip.style('opacity', '0')
        })
         
     const xScale = d3.scaleLinear()
