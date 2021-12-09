@@ -6,4 +6,4 @@
 # Live Link
 https://chuanqizhu0820.github.io/Heat-map/
 
-![ScreenShot]()
+![ScreenShot](heat-map.png)
