@@ -146,8 +146,6 @@ fetch('https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/maste
     d3.select('#legend')
       .append('g')
       .attr("transform", "translate(0,10)")
-      .call(legendAxis)
-    
-      
+      .call(legendAxis) 
 } );
 
